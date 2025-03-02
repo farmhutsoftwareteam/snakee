@@ -134,7 +134,7 @@ const StartGameScreen: React.FC<StartGameProps> = ({ onStartGame }) => {
       type: 'regular' as FoodType,
       value: 1
     });
-    console.log(`Placed food #${currentFoodIndex + 1} at position (${foodPosition.x}, ${foodPosition.y})`);
+    
   };
   
   // Function to check if a position is occupied by the snake's body
@@ -162,7 +162,7 @@ const StartGameScreen: React.FC<StartGameProps> = ({ onStartGame }) => {
       dy = dy > 0 ? dy - GRID_SIZE : dy + GRID_SIZE;
     }
     
-    console.log(`Direction calculation: dx=${dx}, dy=${dy}, head=(${head.x},${head.y}), food=(${foodPos.x},${foodPos.y})`);
+    //console.log(`Direction calculation: dx=${dx}, dy=${dy}, head=(${head.x},${head.y}), food=(${foodPos.x},${foodPos.y})`);
     
     // For predetermined path, prioritize x-axis movement first, then y-axis
     // This creates a more predictable path
@@ -246,7 +246,7 @@ const StartGameScreen: React.FC<StartGameProps> = ({ onStartGame }) => {
     // Check for food collision
     const ateFood = newHead.x === foodPos.x && newHead.y === foodPos.y;
     
-    console.log(`Snake head: (${newHead.x}, ${newHead.y}), Food: (${foodPos.x}, ${foodPos.y}), Ate food: ${ateFood}`);
+    //console.log(`Snake head: (${newHead.x}, ${newHead.y}), Food: (${foodPos.x}, ${foodPos.y}), Ate food: ${ateFood}`);
     
     let newSnake: Position[];
     
@@ -272,7 +272,7 @@ const StartGameScreen: React.FC<StartGameProps> = ({ onStartGame }) => {
         value: 1
       });
       
-      console.log(`Snake ate food! New length: ${newSnake.length}, Moving to food #${nextFoodIndex + 1} at (${nextFoodPosition.x}, ${nextFoodPosition.y})`);
+      //console.log(`Snake ate food! New length: ${newSnake.length}, Moving to food #${nextFoodIndex + 1} at (${nextFoodPosition.x}, ${nextFoodPosition.y})`);
     } else {
       // No collision, just move normally
       newSnake = [newHead, ...currentSnake.slice(0, -1)];
@@ -315,8 +315,7 @@ const StartGameScreen: React.FC<StartGameProps> = ({ onStartGame }) => {
           <Text style={styles.buttonText}>START GAME</Text>
         </TouchableOpacity>
         
-        <Text style={styles.instructions}>Watch the snake eat food!</Text>
-        <Text style={styles.scoreText}>Demo Score: {score}</Text>
+       
       </View>
     </SafeAreaView>
   );
