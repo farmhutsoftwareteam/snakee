@@ -149,7 +149,7 @@ const StartGameScreen: React.FC<StartGameProps> = ({ onStartGame }) => {
 
   // Simplified direction finding that always moves toward food
   const getDirectionToFood = (head: Position, foodPos: Position, snake: Position[], currentDir: Direction): Direction => {
-    // Calculate direct distances with wrapping
+    // Calculate direct distances
     let dx = foodPos.x - head.x;
     let dy = foodPos.y - head.y;
     
@@ -169,38 +169,8 @@ const StartGameScreen: React.FC<StartGameProps> = ({ onStartGame }) => {
       'right': 'left'
     };
     
-    // Simple approach: always move on x-axis first, then y-axis
-    // This ensures we don't get stuck in vertical lines
-    
-    // If we're exactly aligned on x-axis, move on y-axis
-    if (dx === 0) {
-      const verticalDir = dy > 0 ? 'down' : 'up';
-      if (verticalDir !== opposites[currentDir]) {
-        const newHead = getNewHead(head, verticalDir, GRID_SIZE, false);
-        const wouldCollide = snake.slice(0, -1).some(segment => 
-          segment.x === newHead.x && segment.y === newHead.y
-        );
-        if (!wouldCollide) {
-          return verticalDir;
-        }
-      }
-      
-      // If vertical movement would cause collision, move horizontally to break out
-      const horizontalDirs: Direction[] = ['left', 'right'];
-      for (const dir of horizontalDirs) {
-        if (dir !== opposites[currentDir]) {
-          const newHead = getNewHead(head, dir, GRID_SIZE, false);
-          const wouldCollide = snake.slice(0, -1).some(segment => 
-            segment.x === newHead.x && segment.y === newHead.y
-          );
-          if (!wouldCollide) {
-            return dir; // Move horizontally to break out of vertical alignment
-          }
-        }
-      }
-    }
-    
-    // Always prioritize x-axis movement first (this prevents vertical line traps)
+    // IMPORTANT: Always try horizontal movement first to avoid vertical traps
+    // This is the key change to prevent getting stuck in vertical lines
     if (dx !== 0) {
       const horizontalDir = dx > 0 ? 'right' : 'left';
       if (horizontalDir !== opposites[currentDir]) {
@@ -214,7 +184,7 @@ const StartGameScreen: React.FC<StartGameProps> = ({ onStartGame }) => {
       }
     }
     
-    // Then try y-axis
+    // Then try vertical movement
     if (dy !== 0) {
       const verticalDir = dy > 0 ? 'down' : 'up';
       if (verticalDir !== opposites[currentDir]) {
@@ -228,7 +198,7 @@ const StartGameScreen: React.FC<StartGameProps> = ({ onStartGame }) => {
       }
     }
     
-    // If direct paths are blocked, try any safe direction
+    // Try any safe direction if direct paths are blocked
     const allDirections: Direction[] = ['up', 'right', 'down', 'left'];
     for (const dir of allDirections) {
       if (dir !== opposites[currentDir]) {
@@ -413,5 +383,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default StartGameScreen;
 export default StartGameScreen;
