@@ -147,7 +147,7 @@ const StartGameScreen: React.FC<StartGameProps> = ({ onStartGame }) => {
     return Math.abs(pos1.x - pos2.x) + Math.abs(pos1.y - pos2.y);
   };
 
-  // Simplified direction finding for predetermined path
+  // Simplified direction finding that always moves toward food
   const getDirectionToFood = (head: Position, foodPos: Position, snake: Position[], currentDir: Direction): Direction => {
     // Calculate direct distances with wrapping
     let dx = foodPos.x - head.x;
@@ -162,10 +162,6 @@ const StartGameScreen: React.FC<StartGameProps> = ({ onStartGame }) => {
       dy = dy > 0 ? dy - GRID_SIZE : dy + GRID_SIZE;
     }
     
-    //console.log(`Direction calculation: dx=${dx}, dy=${dy}, head=(${head.x},${head.y}), food=(${foodPos.x},${foodPos.y})`);
-    
-    // For predetermined path, prioritize x-axis movement first, then y-axis
-    // This creates a more predictable path
     const opposites: Record<Direction, Direction> = {
       'up': 'down',
       'down': 'up',
@@ -173,39 +169,66 @@ const StartGameScreen: React.FC<StartGameProps> = ({ onStartGame }) => {
       'right': 'left'
     };
     
-    // First try to align on x-axis
+    // Simple approach: always move on x-axis first, then y-axis
+    // This ensures we don't get stuck in vertical lines
+    
+    // If we're exactly aligned on x-axis, move on y-axis
+    if (dx === 0) {
+      const verticalDir = dy > 0 ? 'down' : 'up';
+      if (verticalDir !== opposites[currentDir]) {
+        const newHead = getNewHead(head, verticalDir, GRID_SIZE, false);
+        const wouldCollide = snake.slice(0, -1).some(segment => 
+          segment.x === newHead.x && segment.y === newHead.y
+        );
+        if (!wouldCollide) {
+          return verticalDir;
+        }
+      }
+      
+      // If vertical movement would cause collision, move horizontally to break out
+      const horizontalDirs: Direction[] = ['left', 'right'];
+      for (const dir of horizontalDirs) {
+        if (dir !== opposites[currentDir]) {
+          const newHead = getNewHead(head, dir, GRID_SIZE, false);
+          const wouldCollide = snake.slice(0, -1).some(segment => 
+            segment.x === newHead.x && segment.y === newHead.y
+          );
+          if (!wouldCollide) {
+            return dir; // Move horizontally to break out of vertical alignment
+          }
+        }
+      }
+    }
+    
+    // Always prioritize x-axis movement first (this prevents vertical line traps)
     if (dx !== 0) {
       const horizontalDir = dx > 0 ? 'right' : 'left';
       if (horizontalDir !== opposites[currentDir]) {
-        // Check if this would cause a collision
         const newHead = getNewHead(head, horizontalDir, GRID_SIZE, false);
         const wouldCollide = snake.slice(0, -1).some(segment => 
           segment.x === newHead.x && segment.y === newHead.y
         );
-        
         if (!wouldCollide) {
           return horizontalDir;
         }
       }
     }
     
-    // Then try to align on y-axis
+    // Then try y-axis
     if (dy !== 0) {
       const verticalDir = dy > 0 ? 'down' : 'up';
       if (verticalDir !== opposites[currentDir]) {
-        // Check if this would cause a collision
         const newHead = getNewHead(head, verticalDir, GRID_SIZE, false);
         const wouldCollide = snake.slice(0, -1).some(segment => 
           segment.x === newHead.x && segment.y === newHead.y
         );
-        
         if (!wouldCollide) {
           return verticalDir;
         }
       }
     }
     
-    // If we can't move directly toward food, try any safe direction
+    // If direct paths are blocked, try any safe direction
     const allDirections: Direction[] = ['up', 'right', 'down', 'left'];
     for (const dir of allDirections) {
       if (dir !== opposites[currentDir]) {
@@ -390,4 +413,5 @@ const styles = StyleSheet.create({
   }
 });
 
+export default StartGameScreen;
 export default StartGameScreen;
